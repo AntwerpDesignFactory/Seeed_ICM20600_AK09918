@@ -10,12 +10,12 @@ ICM20600::ICM20600(bool AD0) {
 }
 
 uint8_t ICM20600::getDeviceID() {
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_WHO_AM_I);
-    Wire1.endTransmission();
-    Wire1.requestFrom(_addr, (uint8_t)1);
-    if (Wire1.available()) {
-        return Wire1.read();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_WHO_AM_I);
+    Wire.endTransmission();
+    Wire.requestFrom(_addr, (uint8_t)1);
+    if (Wire.available()) {
+        return Wire.read();
     } else {
         return 0;
     }
@@ -23,23 +23,23 @@ uint8_t ICM20600::getDeviceID() {
 
 void ICM20600::initialize() {
     // configuration
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_CONFIG);
-    Wire1.write(0x00);
-    Wire1.write(ICM20600_FIFO_EN);
-    Wire1.write(0x00);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_CONFIG);
+    Wire.write(0x00);
+    Wire.write(ICM20600_FIFO_EN);
+    Wire.write(0x00);
+    Wire.endTransmission();
 
     // set default power mode
     ICM20600::setPowerMode(ICM_6AXIS_LOW_POWER);
 
     // gyro config
-    ICM20600::setGyroScaleRange(RANGE_2K_DPS);
+    ICM20600::setGyroScaleRange(RANGE_250_DPS);
     ICM20600::setGyroOutputDataRate(GYRO_RATE_1K_BW_176);
     ICM20600::setGyroAverageSample(GYRO_AVERAGE_1);
 
     // accel config
-    ICM20600::setAccScaleRange(RANGE_16G);
+    ICM20600::setAccScaleRange(RANGE_2G);
     ICM20600::setAccOutputDataRate(ACC_RATE_1K_BW_420);
     ICM20600::setAccAverageSample(ACC_AVERAGE_4);
 }
@@ -49,21 +49,21 @@ void ICM20600::setPowerMode(icm20600_power_type_t mode) {
     uint8_t data_pwr2 = 0x00;
     uint8_t data_gyro_lp;
 
-    Wire1.begin();
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_PWR_MGMT_1);
-    Wire1.endTransmission();
+    Wire.begin();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_PWR_MGMT_1);
+    Wire.endTransmission();
 
-    Wire1.requestFrom(_addr, 1);
-    data_pwr1 = Wire1.read();
+    Wire.requestFrom(_addr, 1);
+    data_pwr1 = Wire.read();
     data_pwr1 &= 0x8f;
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_GYRO_LP_MODE_CFG);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_GYRO_LP_MODE_CFG);
+    Wire.endTransmission();
 
-    Wire1.requestFrom(_addr, 1);
-    data_gyro_lp = Wire1.read();
+    Wire.requestFrom(_addr, 1);
+    data_gyro_lp = Wire.read();
     data_gyro_lp &= 0x7f;
 
     switch (mode) {
@@ -109,40 +109,40 @@ void ICM20600::setPowerMode(icm20600_power_type_t mode) {
     default:
         break;
     }
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_PWR_MGMT_1);
-    Wire1.write(data_pwr1);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_PWR_MGMT_1);
+    Wire.write(data_pwr1);
+    Wire.endTransmission();
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_PWR_MGMT_2);
-    Wire1.write(data_pwr2);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_PWR_MGMT_2);
+    Wire.write(data_pwr2);
+    Wire.endTransmission();
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_GYRO_LP_MODE_CFG);
-    Wire1.write(data_gyro_lp);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_GYRO_LP_MODE_CFG);
+    Wire.write(data_gyro_lp);
+    Wire.endTransmission();
 }
 
 // SAMPLE_RATE = 1KHz / (1 + div)
 // work for low-power gyroscope and low-power accelerometer and low-noise accelerometer
 void ICM20600::setSampleRateDivider(uint8_t div) {
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_SMPLRT_DIV);
-    Wire1.write(div);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_SMPLRT_DIV);
+    Wire.write(div);
+    Wire.endTransmission();
 }
 
 void ICM20600::setAccScaleRange(acc_scale_type_t range) {
     uint8_t data;
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_ACCEL_CONFIG);
-    Wire1.endTransmission(false);
-    Wire1.requestFrom(_addr, (uint8_t)1);
-    if (Wire1.available())
-        data = Wire1.read();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_ACCEL_CONFIG);
+    Wire.endTransmission(false);
+    Wire.requestFrom(_addr, (uint8_t)1);
+    if (Wire.available())
+        data = Wire.read();
 
     data &= 0xe7; // 0b 1110 0111
 
@@ -171,22 +171,22 @@ void ICM20600::setAccScaleRange(acc_scale_type_t range) {
         break;
     }
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_ACCEL_CONFIG);
-    Wire1.write(data);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_ACCEL_CONFIG);
+    Wire.write(data);
+    Wire.endTransmission();
 }
 
 // for low power mode only
 void ICM20600::setAccAverageSample(acc_averaging_sample_type_t sample) {
     uint8_t data;
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_ACCEL_CONFIG2);
-    Wire1.endTransmission(false);
-    Wire1.requestFrom(_addr, (uint8_t)1);
-    if (Wire1.available())
-        data = Wire1.read();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_ACCEL_CONFIG2);
+    Wire.endTransmission(false);
+    Wire.requestFrom(_addr, (uint8_t)1);
+    if (Wire.available())
+        data = Wire.read();
 
     data &= 0xcf; // & 0b11001111
 
@@ -211,21 +211,21 @@ void ICM20600::setAccAverageSample(acc_averaging_sample_type_t sample) {
         break;
     }
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_ACCEL_CONFIG2);
-    Wire1.write(data);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_ACCEL_CONFIG2);
+    Wire.write(data);
+    Wire.endTransmission();
 }
 
 void ICM20600::setAccOutputDataRate(acc_lownoise_odr_type_t odr) {
     uint8_t data;
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_ACCEL_CONFIG2);
-    Wire1.endTransmission(false);
-    Wire1.requestFrom(_addr, (uint8_t)1);
-    if (Wire1.available())
-        data = Wire1.read();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_ACCEL_CONFIG2);
+    Wire.endTransmission(false);
+    Wire.requestFrom(_addr, (uint8_t)1);
+    if (Wire.available())
+        data = Wire.read();
 
     data &= 0xf0; // 0b11110000
 
@@ -266,20 +266,20 @@ void ICM20600::setAccOutputDataRate(acc_lownoise_odr_type_t odr) {
         break;
     }
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_ACCEL_CONFIG2);
-    Wire1.write(data);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_ACCEL_CONFIG2);
+    Wire.write(data);
+    Wire.endTransmission();
 }
 
 void ICM20600::setGyroScaleRange(gyro_scale_type_t range) {
     uint8_t data = 0;
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_GYRO_CONFIG);
-    Wire1.endTransmission(false); // repeated start
-    Wire1.requestFrom((int)_addr, 1);
-    if (Wire1.available()) {
-        data = Wire1.read();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_GYRO_CONFIG);
+    Wire.endTransmission(false); // repeated start
+    Wire.requestFrom((int)_addr, 1);
+    if (Wire.available()) {
+        data = Wire.read();
     }
 
     data &= 0xe7; // 0b11100111
@@ -309,21 +309,21 @@ void ICM20600::setGyroScaleRange(gyro_scale_type_t range) {
         break;
     }
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_GYRO_CONFIG);
-    Wire1.write(data);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_GYRO_CONFIG);
+    Wire.write(data);
+    Wire.endTransmission();
 }
 
 // for low power mode only
 void ICM20600::setGyroAverageSample(gyro_averaging_sample_type_t sample) {
     uint8_t data = 0;
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_GYRO_LP_MODE_CFG);
-    Wire1.endTransmission(false);
-    Wire1.requestFrom(_addr, 1);
-    data = Wire1.read();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_GYRO_LP_MODE_CFG);
+    Wire.endTransmission(false);
+    Wire.requestFrom(_addr, 1);
+    data = Wire.read();
 
     data &= 0x8f; // 0b10001111
     switch (sample) {
@@ -363,23 +363,23 @@ void ICM20600::setGyroAverageSample(gyro_averaging_sample_type_t sample) {
         break;
     }
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_GYRO_LP_MODE_CFG);
-    Wire1.write(data);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_GYRO_LP_MODE_CFG);
+    Wire.write(data);
+    Wire.endTransmission();
 }
 
 void ICM20600::setGyroOutputDataRate(gyro_lownoise_odr_type_t odr) {
     uint8_t data;
 
     // Start reading from the ICM20600_CONFIG register
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_CONFIG);
-    Wire1.endTransmission();
-    Wire1.requestFrom(_addr, (uint8_t)1);
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_CONFIG);
+    Wire.endTransmission();
+    Wire.requestFrom(_addr, (uint8_t)1);
 
-    if (Wire1.available()) {
-        data = Wire1.read();
+    if (Wire.available()) {
+        data = Wire.read();
     }
 
     data &= 0xF8; // DLPF_CFG[2:0] 0b11111000
@@ -412,10 +412,10 @@ void ICM20600::setGyroOutputDataRate(gyro_lownoise_odr_type_t odr) {
     }
 
     // Start writing to the ICM20600_CONFIG register
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_CONFIG);
-    Wire1.write(data);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_CONFIG);
+    Wire.write(data);
+    Wire.endTransmission();
 }
 
 void ICM20600::getAcceleration(int16_t *x, int16_t *y, int16_t *z) {
@@ -468,14 +468,14 @@ int16_t ICM20600::getRaw(int regAddr) {
     uint8_t data[2];
 
     // Start reading from the ICM20600_ACCEL_XOUT_H register
-    Wire1.beginTransmission(_addr);
-    Wire1.write(regAddr);
-    Wire1.endTransmission();
-    Wire1.requestFrom(_addr, (uint8_t)2);
+    Wire.beginTransmission(_addr);
+    Wire.write(regAddr);
+    Wire.endTransmission();
+    Wire.requestFrom(_addr, (uint8_t)2);
 
-    if (Wire1.available() == 2) {
-        data[0] = Wire1.read(); // High byte
-        data[1] = Wire1.read(); // Low byte
+    if (Wire.available() == 2) {
+        data[0] = Wire.read(); // High byte
+        data[1] = Wire.read(); // Low byte
     }
     return ((int16_t)data[0] << 8) + _buffer[1];
 }
@@ -485,14 +485,14 @@ int16_t ICM20600::getTemperature(void) {
     uint16_t rawdata;
 
     // Start reading from the ICM20600_TEMP_OUT_H register
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_TEMP_OUT_H);
-    Wire1.endTransmission();
-    Wire1.requestFrom(_addr, (uint8_t)2);
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_TEMP_OUT_H);
+    Wire.endTransmission();
+    Wire.requestFrom(_addr, (uint8_t)2);
 
-    if (Wire1.available() == 2) {
-        data[0] = Wire1.read(); // High byte
-        data[1] = Wire1.read(); // Low byte
+    if (Wire.available() == 2) {
+        data[0] = Wire.read(); // High byte
+        data[1] = Wire.read(); // Low byte
     }
 
     rawdata = (((uint16_t)data[0]) << 8) | data[1];
@@ -503,21 +503,21 @@ void ICM20600::reset() {
     uint8_t data;
 
     // Start reading from the ICM20600_USER_CTRL register
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_USER_CTRL);
-    Wire1.endTransmission();
-    Wire1.requestFrom(_addr, (uint8_t)1);
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_USER_CTRL);
+    Wire.endTransmission();
+    Wire.requestFrom(_addr, (uint8_t)1);
 
-    if (Wire1.available()) {
-        data = Wire1.read();
+    if (Wire.available()) {
+        data = Wire.read();
     }
 
     data &= 0xFE; // ICM20600_USER_CTRL[0] 0b11111110
     data |= ICM20600_RESET_BIT;
 
     // Start writing to the ICM20600_USER_CTRL register
-    Wire1.beginTransmission(_addr);
-    Wire1.write(ICM20600_USER_CTRL);
-    Wire1.write(data);
-    Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(ICM20600_USER_CTRL);
+    Wire.write(data);
+    Wire.endTransmission();
 }

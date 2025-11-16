@@ -51,15 +51,15 @@ AK09918_err_type_t AK09918::initialize(AK09918_mode_type_t mode) {
 }
 
 AK09918_err_type_t AK09918::isDataReady() {
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_ST1);
-    if (Wire1.endTransmission(false) != 0) { // false to keep the connection active
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_ST1);
+    if (Wire.endTransmission(false) != 0) { // false to keep the connection active
         return AK09918_ERR_READ_FAILED;
     }
 
-    Wire1.requestFrom((int)_addr, 1); // request 1 byte
-    if (Wire1.available()) {
-        _buffer[0] = Wire1.read();
+    Wire.requestFrom((int)_addr, 1); // request 1 byte
+    if (Wire.available()) {
+        _buffer[0] = Wire.read();
         if (_buffer[0] & AK09918_DRDY_BIT) {
             return AK09918_ERR_OK;
         } else {
@@ -71,15 +71,15 @@ AK09918_err_type_t AK09918::isDataReady() {
 }
 
 AK09918_err_type_t AK09918::isDataSkip() {
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_ST1);
-    if (Wire1.endTransmission(false) != 0) { // false to keep the connection active
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_ST1);
+    if (Wire.endTransmission(false) != 0) { // false to keep the connection active
         return AK09918_ERR_READ_FAILED;
     }
 
-    Wire1.requestFrom((int)_addr, 1); // request 1 byte
-    if (Wire1.available()) {
-        _buffer[0] = Wire1.read();
+    Wire.requestFrom((int)_addr, 1); // request 1 byte
+    if (Wire.available()) {
+        _buffer[0] = Wire.read();
         if (_buffer[0] & AK09918_DOR_BIT) {
             return AK09918_ERR_DOR;
         } else {
@@ -116,16 +116,16 @@ AK09918_err_type_t AK09918::getRawData(int32_t *axis_x, int32_t *axis_y, int32_t
         }
     }
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_HXL);
-    if (Wire1.endTransmission(false) != 0) { // false to keep the connection active
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_HXL);
+    if (Wire.endTransmission(false) != 0) { // false to keep the connection active
         return AK09918_ERR_READ_FAILED;
     }
 
-    Wire1.requestFrom((int)_addr, 8); // request 8 bytes
-    if (Wire1.available() >= 8) {
+    Wire.requestFrom((int)_addr, 8); // request 8 bytes
+    if (Wire.available() >= 8) {
         for (int i = 0; i < 8; i++) {
-            _buffer[i] = Wire1.read();
+            _buffer[i] = Wire.read();
         }
         *axis_x = (int16_t)(_buffer[1] << 8 | _buffer[0]);
         *axis_y = (int16_t)(_buffer[3] << 8 | _buffer[2]);
@@ -149,10 +149,10 @@ AK09918_err_type_t AK09918::switchMode(AK09918_mode_type_t mode) {
     }
     _mode = mode;
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_CNTL2);
-    Wire1.write(mode);
-    if (Wire1.endTransmission() != 0) {
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_CNTL2);
+    Wire.write(mode);
+    if (Wire.endTransmission() != 0) {
         return AK09918_ERR_WRITE_FAILED;
     }
     return AK09918_ERR_OK;
@@ -167,18 +167,18 @@ AK09918_err_type_t AK09918::selfTest() {
     bool is_end = false;
     AK09918_err_type_t err;
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_CNTL2);
-    Wire1.write(AK09918_POWER_DOWN);
-    if (Wire1.endTransmission() != 0) {
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_CNTL2);
+    Wire.write(AK09918_POWER_DOWN);
+    if (Wire.endTransmission() != 0) {
         return AK09918_ERR_WRITE_FAILED;
     }
     delay(1);
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_CNTL2);
-    Wire1.write(AK09918_SELF_TEST);
-    if (Wire1.endTransmission() != 0) {
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_CNTL2);
+    Wire.write(AK09918_SELF_TEST);
+    if (Wire.endTransmission() != 0) {
         return AK09918_ERR_WRITE_FAILED;
     }
 
@@ -193,16 +193,16 @@ AK09918_err_type_t AK09918::selfTest() {
     }
 
     // Read data and check
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_HXL);
-    if (Wire1.endTransmission(false) != 0) {
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_HXL);
+    if (Wire.endTransmission(false) != 0) {
         return AK09918_ERR_READ_FAILED;
     }
 
-    Wire1.requestFrom((int)_addr, 8);
-    if (Wire1.available() >= 8) {
+    Wire.requestFrom((int)_addr, 8);
+    if (Wire.available() >= 8) {
         for (int i = 0; i < 8; i++) {
-            _buffer[i] = Wire1.read();
+            _buffer[i] = Wire.read();
         }
 
         axis_x = (int32_t)((((int16_t)_buffer[1]) << 8) | _buffer[0]);
@@ -223,10 +223,10 @@ AK09918_err_type_t AK09918::selfTest() {
 }
 
 AK09918_err_type_t AK09918::reset() {
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_CNTL3);
-    Wire1.write(AK09918_SRST_BIT);
-    byte error = Wire1.endTransmission();
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_CNTL3);
+    Wire.write(AK09918_SRST_BIT);
+    byte error = Wire.endTransmission();
 
     if (error) {
         return AK09918_ERR_WRITE_FAILED;
@@ -279,27 +279,27 @@ String AK09918::strError(AK09918_err_type_t err) {
 uint16_t AK09918::getDeviceID() {
     uint16_t deviceID = 0;
 
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_WIA1);
-    if (Wire1.endTransmission(false) == 0) {
-        Wire1.requestFrom(_addr, (uint8_t)2);
-        if (Wire1.available() == 2) {
-            deviceID = Wire1.read() << 8;
-            deviceID |= Wire1.read();
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_WIA1);
+    if (Wire.endTransmission(false) == 0) {
+        Wire.requestFrom(_addr, (uint8_t)2);
+        if (Wire.available() == 2) {
+            deviceID = Wire.read() << 8;
+            deviceID |= Wire.read();
         }
     }
     return deviceID;
 }
 
 uint8_t AK09918::_getRawMode() {
-    Wire1.beginTransmission(_addr);
-    Wire1.write(AK09918_CNTL2);
-    if (Wire1.endTransmission(false) != 0) {
+    Wire.beginTransmission(_addr);
+    Wire.write(AK09918_CNTL2);
+    if (Wire.endTransmission(false) != 0) {
         return 0xFF;
     } else {
-        Wire1.requestFrom(_addr, (byte)1);
-        if (Wire1.available()) {
-            _buffer[0] = Wire1.read();
+        Wire.requestFrom(_addr, (byte)1);
+        if (Wire.available()) {
+            _buffer[0] = Wire.read();
         }
         return _buffer[0];
     }
