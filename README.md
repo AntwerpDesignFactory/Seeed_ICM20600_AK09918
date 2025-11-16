@@ -1,5 +1,8 @@
 # Note on fork
 A drop in replacement for the original library that does not rely on i2cDev. As i couldn't get i2cdev to work with my teensy 4.0. This library should work with any MC that supports the Wire library. 
+## Addition
+This modification from nilskiefer made the library compile, but wire1 (as used in his fork) still errorred. So changed the wire1 to wire and made it work this way. Other than that just changed the default ranges since they used to be on the big range with limited resolution.
+
 
 # Seeed ICM20600 + AK09918 Library  [![Build Status](https://travis-ci.com/Seeed-Studio/Seeed_ICM20600_AK09918.svg?branch=master)](https://travis-ci.com/Seeed-Studio/Seeed_ICM20600_AK09918)
 
